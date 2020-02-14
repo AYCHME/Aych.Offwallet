@@ -1,0 +1,51 @@
+{
+  "name": "abcwallet_offline_packager",
+  "version": "1.0.0",
+  "author": "Link <xie.al@qq.com>",
+  "description": "A packager for easily creating ABCWallet compatiable offline package.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/BlockABC/abcwallet_offline_packager.git"
+  },
+  "bin": {
+    "offline-package": "dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc -w",
+    "lint": "eslint . --ext .ts --fix",
+    "lint:nofix": "eslint . --ext .ts",
+    "test": "node dist/cli.js -c test/test_config.json",
+    "commit": "npx git-cz",
+    "release": "node release.js"
+  },
+  "dependencies": {
+    "archiver": "^3.1.1",
+    "chalk": "^3.0.0",
+    "fs-extra": "^8.1.0",
+    "glob": "^7.1.6",
+    "loglevel": "^1.6.7",
+    "yargs": "^15.1.0"
+  },
+  "devDependencies": {
+    "@semantic-release/changelog": "^3.0.6",
+    "@semantic-release/exec": "^4.0.0",
+    "@semantic-release/git": "^8.0.0",
+    "@types/jest": "^24.0.25",
+    "@types/node": "12.12.24",
+    "babel-eslint": "^10.0.2",
+    "commitizen": "^4.0.3",
+    "cz-conventional-changelog": "3.0.2",
+    "dotenv": "^8.2.0",
+    "eslint": "^6.1.0",
+    "eslint-config-blockabc": "^0.6.1",
+    "semantic-release": "^16.0.1",
+    "typescript": "^3.7.0"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  }
+}
