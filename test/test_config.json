@@ -1,7 +1,7 @@
 {
-  "pid": "101",
-  "input": "test/public",
-  "output": "test/create_by_config.zip",
+  "pid": "287",
+  "input": "./public",
+  "output": "./create_by_config.zip",
   "map": [
     {
       "from": ".",

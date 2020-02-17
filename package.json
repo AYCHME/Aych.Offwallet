@@ -16,16 +16,20 @@
     "dev": "tsc -w",
     "lint": "eslint . --ext .ts --fix",
     "lint:nofix": "eslint . --ext .ts",
-    "test": "node dist/cli.js -c test/test_config.json",
+    "test:pack": "node dist/cli.js pack -v -c test/test_config.json",
+    "test:deploy": "cross-env DS_BASE_URL=http://127.0.0.1:14001/api/open node dist/cli.js deploy -v -I 287 -i test/create_by_config.zip",
+    "test:deploy-config": "cross-env DS_BASE_URL=http://127.0.0.1:14001/api/open node dist/cli.js deploy -v -c test/test_config.json",
     "commit": "npx git-cz",
     "release": "node release.js"
   },
   "dependencies": {
     "archiver": "^3.1.1",
     "chalk": "^3.0.0",
+    "form-data": "^3.0.0",
     "fs-extra": "^8.1.0",
     "glob": "^7.1.6",
     "loglevel": "^1.6.7",
+    "node-fetch": "^2.6.0",
     "yargs": "^15.1.0"
   },
   "devDependencies": {
@@ -36,6 +40,7 @@
     "@types/node": "12.12.24",
     "babel-eslint": "^10.0.2",
     "commitizen": "^4.0.3",
+    "cross-env": "^7.0.0",
     "cz-conventional-changelog": "3.0.2",
     "dotenv": "^8.2.0",
     "eslint": "^6.1.0",

@@ -19,6 +19,7 @@ const chalk_1 = __importDefault(require("chalk"));
 const fs_extra_1 = __importDefault(require("fs-extra"));
 const glob_1 = __importDefault(require("glob"));
 const loglevel_1 = __importDefault(require("loglevel"));
+const DappStoreSDK_1 = require("./DappStoreSDK");
 const logger = loglevel_1.default.getLogger('Main');
 logger.setLevel(loglevel_1.default.levels.INFO);
 const glob = util_1.promisify(glob_1.default);
@@ -39,13 +40,13 @@ class Packager {
     get output() {
         return this._output;
     }
-    async create({ pid, input, output, host = '', map = [], verbose = false }) {
+    async pack({ cwd, pid, input, output, host = '', map = [], verbose = false }) {
         if (verbose) {
             logger.setLevel(loglevel_1.default.levels.TRACE);
         }
         logger.debug(chalk_1.default.blue(`CWD: ${process.cwd()}`));
         assert_1.default(pid && Number.parseInt(pid) > 0, 'Pid must be an integer bigger than 0.');
-        assert_1.default(input, 'Input directory must be a path.');
+        assert_1.default(input, 'Input must be a path to directory.');
         assert_1.default(host || map, 'Host and map can not be both empty.');
         this._pid = pid;
         if (host) {
@@ -60,11 +61,11 @@ class Packager {
         }
         logger.info(chalk_1.default.green(`Validating input path and output path...`));
         // Ensure input path is ok
-        this._input = path.resolve(input);
+        this._input = path.resolve(cwd, input);
         await fs_1.promises.access(this._input, fs_1.constants.X_OK | fs_1.constants.R_OK);
         logger.debug(chalk_1.default.blue(`Input directory: ${this._input}`));
         // Ensure output path is ok
-        this._output = path.resolve(output);
+        this._output = path.resolve(cwd, output);
         let stat;
         let createFile = false;
         let createDir = false;
@@ -101,6 +102,28 @@ class Packager {
             throw new Error('Output path must be either a file path or a directory path.');
         }
         logger.info(chalk_1.default.green(`Create offline package successfully!`));
+    }
+    async deploy({ cwd, pid, input, verbose = false }) {
+        var _a;
+        if (verbose) {
+            logger.setLevel(loglevel_1.default.levels.TRACE);
+        }
+        logger.debug(chalk_1.default.blue(`CWD: ${process.cwd()}`));
+        assert_1.default(pid && Number.parseInt(pid) > 0, 'Pid must be an integer bigger than 0.');
+        assert_1.default(input, 'Input must be a path to archive file.');
+        // Ensure input path is ok
+        const inputPath = path.resolve(cwd, input);
+        await fs_1.promises.access(inputPath, fs_1.constants.R_OK);
+        logger.debug(chalk_1.default.blue(`Input file path: ${inputPath}`));
+        const DappStoreBaseUrl = (_a = process.env.DS_BASE_URL, (_a !== null && _a !== void 0 ? _a : 'https://store.abcwallet.com/api/open'));
+        const sdk = new DappStoreSDK_1.DappStoreSDK({ baseUrl: DappStoreBaseUrl });
+        const email = process.env.DS_EMAIL;
+        const password = process.env.DS_PASSWORD;
+        assert_1.default(email, 'You must set email of ABCWallet Dapp Store account with environment var [DS_EMAIL].');
+        assert_1.default(password, 'You must set password of ABCWallet Dapp Store account with environment var [DS_PASSWORD].');
+        await sdk.login({ email, password });
+        await sdk.uploadPackage({ pid, file: inputPath });
+        logger.info(chalk_1.default.green('Deployment complete.'));
     }
     async archive(inputPath, outputPath) {
         logger.info(chalk_1.default.green(`Start archiving input path ...`));
