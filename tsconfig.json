@@ -5,7 +5,7 @@
     "rootDir": "src/",
     "outDir": "dist/",
     "baseUrl": "./",
-    "target": "ESNext", // 输出代码的版本
+    "target": "ES2018", // 输出代码的版本
     "module": "CommonJS", // 输出代码的模块风格
     "moduleResolution": "node", // 采用 Node 的方式解析模块
     "resolveJsonModule": true, // 解析 JSON 模块
