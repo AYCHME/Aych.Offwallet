@@ -1,4 +1,4 @@
-# ABCWallet Offline Packager
+# ABCWallet Packager
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
@@ -9,11 +9,11 @@ A packager for easily creating ABCWallet compatiable offline package.
 
 ### NPM
 
-`npm install abcwallet-offline-packager`
+`npm install @abcwallet/packager`
 
 ### Yarn
 
-`Yarn add abcwallet-offline-packager`
+`Yarn add @abcwallet/packager`
 
 
 ## Usage
@@ -24,9 +24,9 @@ Node 10+
 
 ### Examples
 
-`offline-packager -I 100 -H 127.0.0.1 -i test/public -o test/archive.zip` Only use commandline options.
+`abcp -I 100 -H 127.0.0.1 -i test/public -o test/archive.zip` Only use commandline options.
 
-`offline-packager -c config.json` Use a JSON config file to pass options, useful for complicated map relation.
+`abcp -c config.json` Use a JSON config file to pass options, useful for complicated map relation.
 
 
 ## Development

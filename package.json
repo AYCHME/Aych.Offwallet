@@ -1,5 +1,5 @@
 {
-  "name": "abcwallet_offline_packager",
+  "name": "@abcwallet/packager",
   "version": "1.0.0",
   "author": "Link <xie.al@qq.com>",
   "description": "A packager for easily creating ABCWallet compatiable offline package.",
@@ -9,7 +9,7 @@
     "url": "https://github.com/BlockABC/abcwallet_offline_packager.git"
   },
   "bin": {
-    "offline-package": "dist/cli.js"
+    "abcp": "dist/cli.js"
   },
   "scripts": {
     "build": "tsc",
