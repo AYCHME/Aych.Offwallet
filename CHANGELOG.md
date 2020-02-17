@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/BlockABC/abcwallet_offline_packager/compare/v1.0.0...v1.1.0) (2020-02-17)
+
+
+### Features
+
+* separate sub commands, add a new deploy command ([a7fd81c](https://github.com/BlockABC/abcwallet_offline_packager/commit/a7fd81c1e562bcb04b1afe76795b0e8e825bcd9f))
+
 # 1.0.0 (2020-02-14)
 
 
