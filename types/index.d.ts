@@ -12,12 +12,19 @@ declare class Packager {
     get map(): IMap;
     get input(): string;
     get output(): string;
-    create({ pid, input, output, host, map, verbose }: {
+    pack({ cwd, pid, input, output, host, map, verbose }: {
+        cwd: string;
         pid: string;
         input: string;
         output: string;
         host?: string;
         map?: IMap;
+        verbose?: boolean;
+    }): Promise<void>;
+    deploy({ cwd, pid, input, verbose }: {
+        cwd: string;
+        pid: string;
+        input: string;
         verbose?: boolean;
     }): Promise<void>;
     protected archive(inputPath: any, outputPath: any): Promise<void>;

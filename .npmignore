@@ -1,0 +1,11 @@
+.idea/
+src/
+test/
+.editorconfig
+.env
+.env.example
+.eslintignore
+.eslintrc.js
+release.js
+tsconfig.json
+yarn.lock
