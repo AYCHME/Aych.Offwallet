@@ -4,6 +4,7 @@ import * as path from 'path'
 import { promisify } from 'util'
 
 import archiver from 'archiver'
+import prompts from 'prompts'
 import chalk from 'chalk'
 import fse from 'fs-extra'
 import { default as globModule } from 'glob'
@@ -146,8 +147,25 @@ class Packager {
     const DappStoreBaseUrl = process.env.DS_BASE_URL ?? 'https://store.abcwallet.com/api/open'
     const sdk = new DappStoreSDK({ baseUrl: DappStoreBaseUrl })
 
-    const email = process.env.DS_EMAIL
-    const password = process.env.DS_PASSWORD
+
+    let email = process.env.DS_EMAIL
+    if (!email) {
+      const res = await prompts({
+        type: 'text',
+        name: 'email',
+        message: `Email of your ${chalk.red('store.abcwallet.com')} account: `,
+      })
+      email = res.email
+    }
+    let password = process.env.DS_PASSWORD
+    if (!password) {
+      const res = await prompts({
+        type: 'password',
+        name: 'password',
+        message: `Password of your ${chalk.red('store.abcwallet.com')} account: `,
+      })
+      password = res.password
+    }
     assert(email, 'You must set email of ABCWallet Dapp Store account with environment var [DS_EMAIL].')
     assert(password, 'You must set password of ABCWallet Dapp Store account with environment var [DS_PASSWORD].')
 

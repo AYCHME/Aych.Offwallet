@@ -6,7 +6,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/BlockABC/abcwallet_offline_packager.git"
+    "url": "https://github.com/BlockABC/abcwallet_packager.git"
   },
   "bin": {
     "abcp": "dist/cli.js"
@@ -30,6 +30,7 @@
     "glob": "^7.1.6",
     "loglevel": "^1.6.7",
     "node-fetch": "^2.6.0",
+    "prompts": "^2.3.1",
     "yargs": "^15.1.0"
   },
   "devDependencies": {

@@ -15,6 +15,7 @@ const fs_1 = require("fs");
 const path = __importStar(require("path"));
 const util_1 = require("util");
 const archiver_1 = __importDefault(require("archiver"));
+const prompts_1 = __importDefault(require("prompts"));
 const chalk_1 = __importDefault(require("chalk"));
 const fs_extra_1 = __importDefault(require("fs-extra"));
 const glob_1 = __importDefault(require("glob"));
@@ -117,8 +118,24 @@ class Packager {
         logger.debug(chalk_1.default.blue(`Input file path: ${inputPath}`));
         const DappStoreBaseUrl = (_a = process.env.DS_BASE_URL, (_a !== null && _a !== void 0 ? _a : 'https://store.abcwallet.com/api/open'));
         const sdk = new DappStoreSDK_1.DappStoreSDK({ baseUrl: DappStoreBaseUrl });
-        const email = process.env.DS_EMAIL;
-        const password = process.env.DS_PASSWORD;
+        let email = process.env.DS_EMAIL;
+        if (!email) {
+            const res = await prompts_1.default({
+                type: 'text',
+                name: 'email',
+                message: `Email of your ${chalk_1.default.red('store.abcwallet.com')} account: `,
+            });
+            email = res.email;
+        }
+        let password = process.env.DS_PASSWORD;
+        if (!password) {
+            const res = await prompts_1.default({
+                type: 'password',
+                name: 'password',
+                message: `Password of your ${chalk_1.default.red('store.abcwallet.com')} account: `,
+            });
+            password = res.password;
+        }
         assert_1.default(email, 'You must set email of ABCWallet Dapp Store account with environment var [DS_EMAIL].');
         assert_1.default(password, 'You must set password of ABCWallet Dapp Store account with environment var [DS_PASSWORD].');
         await sdk.login({ email, password });
