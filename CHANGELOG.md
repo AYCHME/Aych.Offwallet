@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/BlockABC/abcwallet_packager/compare/v1.1.0...v1.2.0) (2020-02-19)
+
+
+### Features
+
+* ask for email and password if not provided ([352d11a](https://github.com/BlockABC/abcwallet_packager/commit/352d11a6bfc9eaa0f960782410036453daa94a28))
+
 # [1.1.0](https://github.com/BlockABC/abcwallet_offline_packager/compare/v1.0.0...v1.1.0) (2020-02-17)
 
 
