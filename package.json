@@ -30,6 +30,7 @@
     "glob": "^7.1.6",
     "loglevel": "^1.6.7",
     "node-fetch": "^2.6.0",
+    "prompts": "^2.3.1",
     "yargs": "^15.1.0"
   },
   "devDependencies": {
