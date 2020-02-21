@@ -1,3 +1,10 @@
+## [1.2.2](https://github.com/BlockABC/abcwallet_packager/compare/v1.2.1...v1.2.2) (2020-02-21)
+
+
+### Bug Fixes
+
+* fix async process of archive ([ceb0bbf](https://github.com/BlockABC/abcwallet_packager/commit/ceb0bbfab7ebe61b6d566a5242f1e0a8b939ca12))
+
 ## [1.2.1](https://github.com/BlockABC/abcwallet_packager/compare/v1.2.0...v1.2.1) (2020-02-21)
 
 

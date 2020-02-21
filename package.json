@@ -1,6 +1,6 @@
 {
   "name": "@abcwallet/packager",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "author": "Link <xie.al@qq.com>",
   "description": "A packager for easily creating ABCWallet compatiable offline package.",
   "license": "MIT",
