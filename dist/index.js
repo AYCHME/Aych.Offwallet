@@ -166,7 +166,7 @@ class Packager {
             });
             archive.pipe(output);
             const map = {};
-            this._map.map(async (pair) => {
+            await Promise.all(this._map.map(async (pair) => {
                 const files = await glob(path.join(inputPath, pair.from, '**/*.*(html|js|css|png|jpg)'));
                 files.forEach(filePath => {
                     let mappedPath = filePath.replace(inputPath + path.sep, '');
@@ -190,7 +190,7 @@ class Packager {
                     map[mappedPath] = mappedPath;
                 });
                 archive.directory(path.join(inputPath, pair.from), path.join(this._pid, pair.to));
-            });
+            }));
             this._logger.debug(`Create map config: ${JSON.stringify(map, null, '  ')}`);
             archive.append(JSON.stringify({ map }, null, '  '), { name: path.join(this._pid, 'config.json') });
             archive.finalize();
