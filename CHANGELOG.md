@@ -1,3 +1,10 @@
+## [1.2.1](https://github.com/BlockABC/abcwallet_packager/compare/v1.2.0...v1.2.1) (2020-02-21)
+
+
+### Bug Fixes
+
+* improve usability ([977f8c7](https://github.com/BlockABC/abcwallet_packager/commit/977f8c73a347c215a9f74a8d3d649b4a6d09776a))
+
 # [1.2.0](https://github.com/BlockABC/abcwallet_packager/compare/v1.1.0...v1.2.0) (2020-02-19)
 
 
