@@ -19,13 +19,12 @@ const prompts_1 = __importDefault(require("prompts"));
 const chalk_1 = __importDefault(require("chalk"));
 const fs_extra_1 = __importDefault(require("fs-extra"));
 const glob_1 = __importDefault(require("glob"));
-const loglevel_1 = __importDefault(require("loglevel"));
+const logger_1 = require("./logger");
 const DappStoreSDK_1 = require("./DappStoreSDK");
-const logger = loglevel_1.default.getLogger('Main');
-logger.setLevel(loglevel_1.default.levels.INFO);
 const glob = util_1.promisify(glob_1.default);
 class Packager {
     constructor() {
+        this._logger = logger_1.logger;
         this._input = '.';
         this._output = '.';
     }
@@ -41,11 +40,14 @@ class Packager {
     get output() {
         return this._output;
     }
-    async pack({ cwd, pid, input, output, host = '', map = [], verbose = false }) {
-        if (verbose) {
-            logger.setLevel(loglevel_1.default.levels.TRACE);
+    async pack({ cwd, pid, input, output, host = '', map = [], verbose = false, logger = null }) {
+        if (logger) {
+            this._logger = logger;
         }
-        logger.debug(chalk_1.default.blue(`CWD: ${process.cwd()}`));
+        if (verbose) {
+            this._logger.level = 'debug';
+        }
+        this._logger.debug(`CWD: ${process.cwd()}`);
         assert_1.default(pid && Number.parseInt(pid) > 0, 'Pid must be an integer bigger than 0.');
         assert_1.default(input, 'Input must be a path to directory.');
         assert_1.default(host || map, 'Host and map can not be both empty.');
@@ -55,16 +57,16 @@ class Packager {
                     from: '.',
                     to: host
                 }];
-            logger.debug(chalk_1.default.blue(`Convert host to map: ${JSON.stringify(this._map)}`));
+            this._logger.debug(`Convert host to map: ${JSON.stringify(this._map)}`);
         }
         else if (map) {
             this._map = map;
         }
-        logger.info(chalk_1.default.green(`Validating input path and output path...`));
+        this._logger.info(`Validating input path and output path...`);
         // Ensure input path is ok
         this._input = path.resolve(cwd, input);
         await fs_1.promises.access(this._input, fs_1.constants.X_OK | fs_1.constants.R_OK);
-        logger.debug(chalk_1.default.blue(`Input directory: ${this._input}`));
+        this._logger.debug(`Input directory: ${this._input}`);
         // Ensure output path is ok
         this._output = path.resolve(cwd, output);
         let stat;
@@ -88,12 +90,12 @@ class Packager {
         }
         // If output path is file, create new archive with the same path
         if (createFile || stat.isFile()) {
-            logger.debug(chalk_1.default.blue(`Output path is file: ${this._output}`));
+            this._logger.debug(`Output path is file: ${this._output}`);
             await this.archive(this._input, this._output);
         }
         // If output path is directory, create new archive in the directory with default file name
         else if (createDir || stat.isDirectory()) {
-            logger.debug(chalk_1.default.blue(`Output path is directory: ${this._output}`));
+            this._logger.debug(`Output path is directory: ${this._output}`);
             await fs_extra_1.default.ensureDir(this._output, { mode: 0o2775 });
             await fs_1.promises.access(this._output, fs_1.constants.X_OK | fs_1.constants.W_OK);
             this._output = path.join(this._output, 'archive.zip');
@@ -102,20 +104,23 @@ class Packager {
         else {
             throw new Error('Output path must be either a file path or a directory path.');
         }
-        logger.info(chalk_1.default.green(`Create offline package successfully!`));
+        this._logger.info(`Create offline package successfully!`);
     }
-    async deploy({ cwd, pid, input, verbose = false }) {
+    async deploy({ cwd, pid, input, verbose = false, logger = null }) {
         var _a;
-        if (verbose) {
-            logger.setLevel(loglevel_1.default.levels.TRACE);
+        if (logger) {
+            this._logger = logger;
         }
-        logger.debug(chalk_1.default.blue(`CWD: ${process.cwd()}`));
+        if (verbose) {
+            this._logger.level = 'debug';
+        }
+        this._logger.debug(`CWD: ${process.cwd()}`);
         assert_1.default(pid && Number.parseInt(pid) > 0, 'Pid must be an integer bigger than 0.');
         assert_1.default(input, 'Input must be a path to archive file.');
         // Ensure input path is ok
         const inputPath = path.resolve(cwd, input);
         await fs_1.promises.access(inputPath, fs_1.constants.R_OK);
-        logger.debug(chalk_1.default.blue(`Input file path: ${inputPath}`));
+        this._logger.debug(chalk_1.default.blue(`Input file path: ${inputPath}`));
         const DappStoreBaseUrl = (_a = process.env.DS_BASE_URL, (_a !== null && _a !== void 0 ? _a : 'https://store.abcwallet.com/api/open'));
         const sdk = new DappStoreSDK_1.DappStoreSDK({ baseUrl: DappStoreBaseUrl });
         let email = process.env.DS_EMAIL;
@@ -140,53 +145,56 @@ class Packager {
         assert_1.default(password, 'You must set password of ABCWallet Dapp Store account with environment var [DS_PASSWORD].');
         await sdk.login({ email, password });
         await sdk.uploadPackage({ pid, file: inputPath });
-        logger.info(chalk_1.default.green('Deployment complete.'));
+        this._logger.info('Deployment complete.');
     }
-    async archive(inputPath, outputPath) {
-        logger.info(chalk_1.default.green(`Start archiving input path ...`));
-        const output = fs_1.createWriteStream(outputPath);
-        const archive = archiver_1.default('zip', {
-            zlib: { level: 9 } // Sets the compression level.
-        });
-        output.on('close', function () {
-            logger.info(chalk_1.default.green(`Archive done, total bytes: ${archive.pointer()}B`));
-        });
-        archive.on('warning', function (err) {
-            logger.warn(`Archiver warning: ${err.message}`);
-        });
-        archive.on('error', function (err) {
-            throw err;
-        });
-        archive.pipe(output);
-        const map = {};
-        await Promise.all(this._map.map(async (pair) => {
-            const files = await glob(path.join(inputPath, pair.from, '**/*.*(html|js|css|png|jpg)'));
-            files.forEach(filePath => {
-                let mappedPath = filePath.replace(inputPath + path.sep, '');
-                mappedPath = path.join(pair.to, mappedPath);
-                if (mappedPath.match(/index\.html$/)) {
-                    // /path/home/ => /path/home/index.html
-                    const fromPath1 = mappedPath.replace(/index\.html$/, '');
-                    map[fromPath1] = mappedPath;
-                    // /path/home => /path/home/index.html
-                    const fromPath2 = mappedPath.replace(/\/index\.html$/, '');
-                    map[fromPath2] = mappedPath;
-                }
-                if (mappedPath.match(/\.html$/)) {
-                    // /path/home/ => /path/home.html
-                    const fromPath1 = mappedPath.replace(/\.html$/, '');
-                    map[fromPath1] = mappedPath;
-                    // /path/home => /path/home.html
-                    const fromPath2 = mappedPath.replace(/\/\.html$/, '');
-                    map[fromPath2] = mappedPath;
-                }
-                map[mappedPath] = mappedPath;
+    archive(inputPath, outputPath) {
+        return new Promise(async (resolve, reject) => {
+            this._logger.info(`Start archiving input path ...`);
+            const output = fs_1.createWriteStream(outputPath);
+            const archive = archiver_1.default('zip', {
+                zlib: { level: 9 } // Sets the compression level.
             });
-            archive.directory(path.join(inputPath, pair.from), path.join(this._pid, pair.to));
-        }));
-        logger.debug(chalk_1.default.blue(`Create map config: ${JSON.stringify(map, null, '  ')}`));
-        archive.append(JSON.stringify({ map }, null, '  '), { name: path.join(this._pid, 'config.json') });
-        archive.finalize();
+            output.on('close', () => {
+                this._logger.info(`Archive done, total bytes: ${archive.pointer()}B`);
+                resolve();
+            });
+            archive.on('warning', (err) => {
+                this._logger.warn(`Archiver warning: ${err.message}`);
+            });
+            archive.on('error', (err) => {
+                reject(err);
+            });
+            archive.pipe(output);
+            const map = {};
+            this._map.map(async (pair) => {
+                const files = await glob(path.join(inputPath, pair.from, '**/*.*(html|js|css|png|jpg)'));
+                files.forEach(filePath => {
+                    let mappedPath = filePath.replace(inputPath + path.sep, '');
+                    mappedPath = path.join(pair.to, mappedPath);
+                    if (mappedPath.match(/index\.html$/)) {
+                        // /path/home/ => /path/home/index.html
+                        const fromPath1 = mappedPath.replace(/index\.html$/, '');
+                        map[fromPath1] = mappedPath;
+                        // /path/home => /path/home/index.html
+                        const fromPath2 = mappedPath.replace(/\/index\.html$/, '');
+                        map[fromPath2] = mappedPath;
+                    }
+                    if (mappedPath.match(/\.html$/)) {
+                        // /path/home/ => /path/home.html
+                        const fromPath1 = mappedPath.replace(/\.html$/, '');
+                        map[fromPath1] = mappedPath;
+                        // /path/home => /path/home.html
+                        const fromPath2 = mappedPath.replace(/\/\.html$/, '');
+                        map[fromPath2] = mappedPath;
+                    }
+                    map[mappedPath] = mappedPath;
+                });
+                archive.directory(path.join(inputPath, pair.from), path.join(this._pid, pair.to));
+            });
+            this._logger.debug(`Create map config: ${JSON.stringify(map, null, '  ')}`);
+            archive.append(JSON.stringify({ map }, null, '  '), { name: path.join(this._pid, 'config.json') });
+            archive.finalize();
+        });
     }
 }
 exports.packager = new Packager();
