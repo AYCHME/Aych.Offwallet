@@ -8,6 +8,7 @@
     "type": "git",
     "url": "https://github.com/BlockABC/abcwallet_packager.git"
   },
+  "main": "dist/index.js",
   "bin": {
     "abcp": "dist/cli.js"
   },
@@ -31,6 +32,7 @@
     "loglevel": "^1.6.7",
     "node-fetch": "^2.6.0",
     "prompts": "^2.3.1",
+    "winston": "^3.2.1",
     "yargs": "^15.1.0"
   },
   "devDependencies": {

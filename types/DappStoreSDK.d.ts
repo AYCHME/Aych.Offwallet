@@ -1,8 +1,11 @@
+import { Logger } from 'winston';
 export declare class DappStoreSDK {
     baseUrl: string;
+    protected _logger: Logger;
     protected _cookies: string;
-    constructor({ baseUrl }: {
+    constructor({ baseUrl, logger }: {
         baseUrl: string;
+        logger?: Logger;
     });
     login({ email, password }: {
         email: string;
